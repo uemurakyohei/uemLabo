@@ -21,7 +21,44 @@ def player(x,y):
 font = pygame.font.SysFont(None,20)
 message = font.render('Hello World',False,(255,255,255))
 
+
 p = 0
+
+
+
+class Game:
+	pygame.init()
+
+
+	def __init__(self):
+		self.settings =Settings()
+
+
+	def run_game(self):
+		running = True
+		while running:
+			screen.fill((0,0,0))
+			screen.blit(message,(20,50))
+
+			eventGame()
+
+			player(playerX,playerY)
+			
+
+			
+
+
+			pygame.display.update()
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -78,57 +115,11 @@ def moveIwo(p):
 
 p_change=0
 
-running = True
-while running:
-	screen.fill((0,0,0))
-	screen.blit(message,(20,50))
-
-	eventGame()
-
-
-	# for event in pygame.event.get():
-	# 	#ueue(event)
-	# 	if event.type == pygame.KEYDOWN:
-	# 		if event.key == pygame.K_LEFT:
-	# 			print('left')
-	# 		elif event.key == pygame.K_RIGHT:
-	# 			print('right')
-
-
-	# for event in pygame.event.get():
-		
-	# 	if event.type == pygame.QUIT:
-	# 		running = False
-		
-	# 	elif event.type == pygame.KEYDOWN:
-
-	# 		if event.key == pygame.K_LEFT:
-	# 			playerX_change = -0.1
-	# 			print('left')
-	# 		elif event.key == pygame.K_RIGHT:
-	# 			playerX_change = 0.1
-	# 			print('right')
-
-	# 	elif event.type == pygame.KEYUP:
-			
-	# 		if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-	# 			playerX_change = 0
-
-	#playerX += playerX_change
-	
-	
 
 
 
 
 
-
-
-
-	player(playerX,playerY)
-	
-
-	
-
-
-	pygame.display.update()
+if __name__ == '__main__':
+    ga = Game()
+    ga.run_game()
