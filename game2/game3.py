@@ -1,28 +1,16 @@
 import pygame
 from pygame import mixer
 
-pygame.init()
-
-screen = pygame.display.set_mode((800,600))
-# screen.fill((80,80,150))
-pygame.display.set_caption('invader game')
-
-#Player
-playerImg = pygame.image.load('ewo_pixel.bmp')
-playerImg = pygame.transform.scale(playerImg,(80,100))
-playerX,playerY = 400,500
-playerX_change = 0
-
-def player(x,y):
-	screen.blit(playerImg,(x,y))
 
 
-#Text
-font = pygame.font.SysFont(None,20)
-message = font.render('Hello World',False,(255,255,255))
 
 
-p = 0
+
+
+
+
+
+
 
 
 
@@ -31,90 +19,80 @@ class Game:
 
 
 	def __init__(self):
-		self.settings =Settings()
+
+		#Player
+		self.playerImg = pygame.image.load('ewo_pixel.bmp')
+		self.playerI = pygame.transform.scale(self.playerImg,(80,100))
+		self.playerX,self.playerY = 400,500
+		self.playerX_change = 0
+
+		#Text
+		self.font = pygame.font.SysFont(None,20)
+		self.message = self.font.render('Hello World',False,(255,255,255))
+
+
+
+		self.screen = pygame.display.set_mode((800,600))
+		# screen.fill((80,80,150))
+		pygame.display.set_caption('invader game')
+
+		self.running = True
+
+
+
 
 
 	def run_game(self):
-		running = True
-		while running:
-			screen.fill((0,0,0))
-			screen.blit(message,(20,50))
-
-			eventGame()
-
-			player(playerX,playerY)
-			
-
-			
-
-
+		while self.running:
+			self.screen.fill((0,0,0))
+			self.screen.blit(self.message,(20,50))
+			self.eventGame()
+			self.player()
 			pygame.display.update()
 
 
 
+	def player(self):
+		self.screen.blit(self.playerI,(self.playerX,self.playerY))
 
 
-
-
-
-
-
-
-
-
-def eventGame():
-	for event in pygame.event.get():
-		global p
-		if event.type == pygame.QUIT:
-			global running
-			running = False
-		
-		elif event.type == pygame.KEYDOWN:
-
-			p = _event_key_down(event)
-
-			#elif event.key == pygame.K_SPACE:
-				# if bullet_state is 'ready':
-				# 	bulletX = playerX
-				# 	fire_bullet(bulletX,bulletY)
-
-		elif event.type == pygame.KEYUP:
+	def eventGame(self):
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				self.running = False
 			
-			p = _event_key_up(event)
+			elif event.type == pygame.KEYDOWN:
 
-	moveIwo(p)
+				self._event_key_down()
 
-def _event_key_down(event):
-	p_change = 0
-	if event.key == pygame.K_LEFT:
-		p_change -= 1
-	elif event.key == pygame.K_RIGHT:
-		p_change += 1
-	return p_change
+				#elif event.key == pygame.K_SPACE:
+					# if bullet_state is 'ready':
+					# 	bulletX = playerX
+					# 	fire_bullet(bulletX,bulletY)
 
+			elif event.type == pygame.KEYUP:
+				
+				self._event_key_up()
 
-def _event_key_up(event):
-	p_change = 0
-	if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-		p_change = 0
-	return p_change
+		self.moveIwo()
 
-
-
-def moveIwo(p):
-	global playerX
-	playerX += p
-	if playerX <= 0:
-		playerX = 0
-	elif playerX >= 736:
-		playerX = 736
+	def _event_key_down(self):
+		if event.key == pygame.K_LEFT:
+			self.playerX_change -= 1
+		elif event.key == pygame.K_RIGHT:
+			self.playerX_change += 1
 
 
+	def _event_key_up(self):
+		if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+			self.playerX_change = 0
 
-
-
-p_change=0
-
+	def moveIwo(self):
+		self.playerX += self.playerX
+		if self.playerX <= 0:
+			self.playerX = 0
+		elif self.playerX >= 736:
+			self.playerX = 736
 
 
 
