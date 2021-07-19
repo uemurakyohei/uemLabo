@@ -62,37 +62,35 @@ class Game:
 				self.running = False
 			
 			elif event.type == pygame.KEYDOWN:
-
-				self._event_key_down()
+				self._event_key_down(event)
 
 				#elif event.key == pygame.K_SPACE:
 					# if bullet_state is 'ready':
 					# 	bulletX = playerX
 					# 	fire_bullet(bulletX,bulletY)
 
-			elif event.type == pygame.KEYUP:
-				
-				self._event_key_up()
+			elif event.type == pygame.KEYUP:				
+				self._event_key_up(event)
 
 		self.moveIwo()
 
-	def _event_key_down(self):
+	def _event_key_down(self,event):
 		if event.key == pygame.K_LEFT:
 			self.playerX_change -= 1
 		elif event.key == pygame.K_RIGHT:
 			self.playerX_change += 1
 
 
-	def _event_key_up(self):
+	def _event_key_up(self,event):
 		if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 			self.playerX_change = 0
 
 	def moveIwo(self):
-		self.playerX += self.playerX
+		self.playerX += self.playerX_change
 		if self.playerX <= 0:
 			self.playerX = 0
-		elif self.playerX >= 736:
-			self.playerX = 736
+		elif self.playerX >= 720:
+			self.playerX = 720
 
 
 
