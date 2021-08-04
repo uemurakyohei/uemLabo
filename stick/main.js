@@ -10,34 +10,33 @@ var data;
 //documentからid属性がstickBoxである要素を取得する
 const stickBox = document.getElementById('resuletBox');
 
-function Stick(timeInput){
-	this.data = timeInput.value;
-	//inputに入れた数値をバラバラにする
-	this.time = this.data.split(/[\n\-\:]/);
-	this.time = this.time.filter(Boolean);
-	this.timeData = [];
+//作成した棒グラフの数を数える
+let classCount = 0;
 
-	//所定内、法定内、法定外
-	this.SHOTEIGAI = 0;
-	this.SHOTEINAI  = 0;
-	this.PLANTIME = 0;
+class Stick{
+	constructor(timeInput){
+		this.data = timeInput.value;
+		//inputに入れた数値をバラバラにする
+		this.time = this.data.split(/[\n\-\:]/);
+		this.time = this.time.filter(Boolean);
+		this.timeData = [];
 
+		//所定内、法定内、法定外
+		this.SHOTEIGAI = 0;
+		this.SHOTEINAI  = 0;
+		this.PLANTIME = 0
 
-
+		classCount +=1;
+	}
 		
 	//所定内、法定内、法定外をDOMに代入する、stick!作成
-	this.addValue = function(){
+	addValue = function(){
 		this.defineTime();
-		let stick = document.createElement("div");
-		stick.className = "stick";
 
-		let planedStick = document.createElement("div");
-		planedStick.className = "planedStick";
-
-		let workStick = document.createElement("div");
-		workStick.className = "workStick";
+		let stick = this.divMake('stick',99);
+		let planedStick = this.divMake('planedStick',99);
+		let workStick = this.divMake('workStick',99);
 		
-
 		let overTime = this.divMake('overTime',this.SHOTEIGAI);
 		workStick.appendChild(overTime);
 		
@@ -55,7 +54,7 @@ function Stick(timeInput){
 
 
 	//値を定義する
-	this.defineTime = function(){
+	defineTime = function(){
 		// array:時間帯を格納
 		let array = [];
 		// array2:時間数を格納
@@ -82,36 +81,46 @@ function Stick(timeInput){
 			}
 	}
 
-	//stickの子要素divを作成
-	this.divMake = function(divName,Time){
-		let Name = divName;
-		//分で計算した値を時間数として扱う
-		let time = this.T2t(Time);
+	//divを作成
+	divMake = function(divName,Time){
+
+
 		let div = document.createElement("div");
-		div.className= Name;
-		div.textContent = time;
-		div.style.height = time*10 + "px";
+		div.className= divName;
+
+		if(Time==0){
+			//0の時にはdivを作成しない
+			div.style.height = 0 + "px";
+		}
+		else if(Time!=99){
+			//99:class=stickの時には不要な要素
+			//分で計算した値を時間数として扱う
+			let time = this.T2t(Time);
+			div.textContent = time;
+			div.style.height = time*10 + "px";
+		}
 		return div;
 	}
+	
 
 
 
 
 
 	//時間数を分単位に変換 10:20→t2T(10,20)→80
-	this.t2T = function(t1,t2){
+	t2T = function(t1,t2){
 		let TIME = t1*60 + t2;
 		return TIME
 	}
 
 	//分単位を時間数に変換 90→1.5
-	this.T2t = function(TIME){
+	T2t = function(TIME){
 		let time =Math.floor(TIME/60*100)/100;
 		return time
 	}
 
 	//時間数を算出
-	this.time2value = function(t1,t2){
+	time2value = function(t1,t2){
 		let value = t2 -t1;
 		return value;
 	}
@@ -120,7 +129,13 @@ function Stick(timeInput){
 
 	//拘束時間、実働時間の計算
 	//TIME:実働時間,SHIFT:シフトの時間
-	this.calcTime = function(SHIFT,TIME){		
+	calcTime = function(SHIFT,TIME){		
+		if (SHIFT == null){
+			SHIFT = 0;
+		}
+		if(TIME == null){
+			TIME = 0;
+		}
 		if (SHIFT < TIME){
 			//シフト時間が8hより下
 			if (SHIFT < 480){
@@ -144,6 +159,31 @@ function Stick(timeInput){
 		console.log("plantime",this.PLANTIME);
 	}
 
+	//静的メソッドで呼び出し可能:Stick.static()
+	static count(){
+		return classCount;
+	}
+
+
+
+	//データのリセット
+	resetValue = function(){
+		this.time = 0;
+		this.timeData = [];
+
+		//所定内、法定内、法定外
+		this.SHOTEIGAI = 0;
+		this.SHOTEINAI  = 0;
+		this.PLANTIME = 0
+
+		//すでにstickが作成されていたら消去する
+		let oldStick = document.getElementsByClassName('stick');
+		if(oldStick){
+			oldStick.innerHTML = '';
+			oldStick.remove;
+		}
+	}
+
 
 }
 
@@ -153,6 +193,7 @@ goStick.addEventListener('click',()=>{
 	// クリック時にデータを取得
 	data = timeInput.value;
 	let Stick1 = new Stick(timeInput);
+	Stick1.resetValue();
 	Stick1.addValue();
 	//console.log(Stick1.timeDate());
 });
@@ -184,7 +225,18 @@ goStick.addEventListener('click',()=>{
 
 
 
+todo 
 
+	*divmakeは外でclassを作って作成
+		じゃないと二度押しされたときに無限にstickが作成されてしまう
+		一週間分作成するときを想定したときに無駄が多くなる気がする
+		7日で改行させるのもこのクラスが受け持つ想定
+	*weekのclassも作成
+		day関数の方を繰り返し呼び出すもの
+		一週間での計算を比較して時間外を計算する
+	*monthのclassも作成
+		一か月での計算を比較して時間外を計算する
+		シンプルになる想定
 
 
 */
