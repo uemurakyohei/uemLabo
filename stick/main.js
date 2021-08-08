@@ -13,6 +13,75 @@ const stickBox = document.getElementById('resuletBox');
 //作成した棒グラフの数を数える
 let classCount = 0;
 
+/////////////////
+//時間の加工//////
+/////////////////
+class inputTimeEditer{
+	constructor(timeInput){
+		this.data = timeInput.value;
+		//inputに入れた数値をバラバラにする
+		this.time = this.data.split(/[\n\-\:]/);
+		this.time = this.time.filter(Boolean);
+		this.inputTime = [];
+
+	}
+		
+	//input要素の中の文字列を数値に変換
+	int2num = function(){
+		const array = this.time;
+		//時間数を計算
+		for (let i = 0; i < this.time.length; i++) {
+			if(Number(array[i])){
+				this.inputTime.push(array[i]);
+			}
+			else{
+				//inputに時間以外の入力があった時にエラー処理を行う予定
+				//★★フラグを立てる処理が必要？
+				console.log("error",arguments.callee.name);
+			}
+		}
+	}
+
+
+	//値を定義する
+	defineTime = function(){
+		// array:時間帯を格納
+		let array = [];
+		// array2:時間数を格納
+		let array2 = [];
+
+		//分単位で時間を格納
+		for (let i = 0; i < this.inputTime.length; i+=2) {
+			let TIME = this.t2T(this.inputTime[i],this.inputTime[i+1]);
+			array.push(TIME);
+		}
+		console.log('array',array);
+
+		//時間数を計算
+		for (let j = 0; j < array.length; j+=2) {
+			let VALUE = this.time2value(array[j],array[j+1]);
+			array2.push(VALUE);
+		}
+		console.log('array2',array2);
+	}
+
+	//時間数を分単位に変換 10:20→t2T(10,20)→80
+	t2T = function(t1,t2){
+		let TIME = t1*60 + t2;
+		return TIME
+	}
+
+	//時間数を算出
+	time2value = function(t1,t2){
+		let value = t2 - t1;
+		return value;
+	}
+
+}
+
+/////////////////
+//1日ごとの計算///
+/////////////////
 class Stick{
 	constructor(timeInput){
 		this.data = timeInput.value;
@@ -188,11 +257,40 @@ class Stick{
 }
 
 
+/////////////////
+//1週ごとの計算///
+/////////////////
+class week{
+	constructor(timeInput){
+		this.data = timeInput.value;
+		//inputに入れた数値をバラバラにする
+		this.time = this.data.split(/[\n\-\:]/);
+		this.time = this.time.filter(Boolean);
+		this.timeData = [];
+
+		//所定内、法定内、法定外
+		this.SHOTEIGAI = 0;
+		this.SHOTEINAI  = 0;
+		this.PLANTIME = 0
+
+		classCount +=1;
+	}
+		
+	//所定内、法定内、法定外をDOMに代入する、stick!作成
+	addValue = function(){
+		this.defineTime();
+	}
+}
+
+
+
 
 goStick.addEventListener('click',()=>{
 	// クリック時にデータを取得
 	data = timeInput.value;
 	let Stick1 = new Stick(timeInput);
+	//let inputTimeEditer = new inTime(timeInput);
+	
 	Stick1.resetValue();
 	Stick1.addValue();
 	//console.log(Stick1.timeDate());
@@ -205,6 +303,9 @@ goStick.addEventListener('click',()=>{
 
 10:00-15:00
 10:00-20:00
+
+
+file:///C:/Users/uemura/git/stick/index.html
 
 	//一日のシフトと実働を一つの配列に入れ込む
 	this.timeDate = function(){
