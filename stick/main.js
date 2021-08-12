@@ -25,19 +25,33 @@ class inputTimeEditer{
 		this.inputTime = [];
 
 	}
-		
+	
+	//実行する用のコンストラクタをセット
+	make = function(){
+		this.int2num();
+		this.defineTime();
+	}
+
 	//input要素の中の文字列を数値に変換
 	int2num = function(){
 		const array = this.time;
 		//時間数を計算
 		for (let i = 0; i < this.time.length; i++) {
-			if(Number(array[i])){
+			//公休日(x)の時に0をセットする
+			if(array[i]=="x"){
+				let j = 0;
+				do {
+				j ++;
+				this.inputTime.push(0);
+				} while (j < 4);
+			}
+			else if(Number(array[i])){
 				this.inputTime.push(array[i]);
 			}
 			else{
 				//inputに時間以外の入力があった時にエラー処理を行う予定
 				//★★フラグを立てる処理が必要？
-				console.log("error",arguments.callee.name);
+				console.log("error");
 			}
 		}
 	}
@@ -83,12 +97,15 @@ class inputTimeEditer{
 //1日ごとの計算///
 /////////////////
 class Stick{
-	constructor(timeInput){
-		this.data = timeInput.value;
-		//inputに入れた数値をバラバラにする
-		this.time = this.data.split(/[\n\-\:]/);
-		this.time = this.time.filter(Boolean);
-		this.timeData = [];
+	constructor(planTime,workTime){
+		// this.data = timeInput.value;
+		// //inputに入れた数値をバラバラにする
+		// this.time = this.data.split(/[\n\-\:]/);
+		// this.time = this.time.filter(Boolean);
+		// this.timeData = [];
+		this.planTime = planTime;
+		this.workTime = workTime;
+
 
 		//所定内、法定内、法定外
 		this.SHOTEIGAI = 0;
@@ -124,30 +141,32 @@ class Stick{
 
 	//値を定義する
 	defineTime = function(){
-		// array:時間帯を格納
-		let array = [];
-		// array2:時間数を格納
-		let array2 = [];
+		// // array:時間帯を格納
+		// let array = [];
+		// // array2:時間数を格納
+		// let array2 = [];
 
-		//分単位で時間を格納
-		for (let i = 1; i < this.time.length+1; i+=2) {
-			let TIME = this.t2T(Number(this.time[i-1]),Number(this.time[i]));
-			array.push(TIME);
-			}
-		console.log('array',array);
+		// //分単位で時間を格納
+		// for (let i = 1; i < this.time.length+1; i+=2) {
+		// 	let TIME = this.t2T(Number(this.time[i-1]),Number(this.time[i]));
+		// 	array.push(TIME);
+		// 	}
+		// console.log('array',array);
 
-		//時間数を計算
-		for (let j = 1; j < array.length+1; j+=2) {
-			let VALUE = this.time2value(array[j-1],array[j]);
-			array2.push(VALUE);
-			}
-		console.log('array2',array2);
+		// //時間数を計算
+		// for (let j = 1; j < array.length+1; j+=2) {
+		// 	let VALUE = this.time2value(array[j-1],array[j]);
+		// 	array2.push(VALUE);
+		// 	}
+		// console.log('array2',array2);
 
 
 		//所定内、法定内、法定外を計算する
-		for (let k = 1; k < array2.length+1; k+=2) {
-			this.calcTime(array2[k-1],array2[k]);
-			}
+		// for (let k = 1; k < array2.length+1; k+=2) {
+		// 	this.calcTime(array2[k-1],array2[k]);
+		// 	}
+
+		this.calcTime(this.planTime,this.workTime);
 	}
 
 	//divを作成
@@ -176,11 +195,11 @@ class Stick{
 
 
 
-	//時間数を分単位に変換 10:20→t2T(10,20)→80
-	t2T = function(t1,t2){
-		let TIME = t1*60 + t2;
-		return TIME
-	}
+	// //時間数を分単位に変換 10:20→t2T(10,20)→80
+	// t2T = function(t1,t2){
+	// 	let TIME = t1*60 + t2;
+	// 	return TIME
+	// }
 
 	//分単位を時間数に変換 90→1.5
 	T2t = function(TIME){
@@ -188,11 +207,11 @@ class Stick{
 		return time
 	}
 
-	//時間数を算出
-	time2value = function(t1,t2){
-		let value = t2 -t1;
-		return value;
-	}
+	// //時間数を算出
+	// time2value = function(t1,t2){
+	// 	let value = t2 -t1;
+	// 	return value;
+	// }
 
 
 
@@ -288,12 +307,18 @@ class week{
 goStick.addEventListener('click',()=>{
 	// クリック時にデータを取得
 	data = timeInput.value;
-	let Stick1 = new Stick(timeInput);
-	//let inputTimeEditer = new inTime(timeInput);
-	
+	let inputTimeEditer1 = new inputTimeEditer(timeInput);
+	inputTimeEditer1.make();
+
+	for (let k = 0; k < inputTimeEditer1.inputTime; k+=2) {
+		let Stick = new Stick(timeInput);
+		this.calcTime(inputTimeEditer1.inputTime[k],inputTimeEditer1.inputTime[k+1]);
+	}
+
+
+
 	Stick1.resetValue();
 	Stick1.addValue();
-	//console.log(Stick1.timeDate());
 });
 
 
