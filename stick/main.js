@@ -22,7 +22,10 @@ class inputTimeEditer{
 		//inputに入れた数値をバラバラにする
 		this.time = this.data.split(/[\n\-\:]/);
 		this.time = this.time.filter(Boolean);
+		//時間帯のそれぞれの開始時間と終了時間を分単位で収納
 		this.inputTime = [];
+		//一日の時間数をそれぞれ分単位で収納
+		this.inputTimeMin = [];
 
 	}
 	
@@ -45,13 +48,13 @@ class inputTimeEditer{
 				this.inputTime.push(0);
 				} while (j < 4);
 			}
-			else if(Number(array[i])){
-				this.inputTime.push(array[i]);
+			else if(Number(array[i])|Number(array[i])==0){
+				this.inputTime.push(Number(array[i]));
 			}
 			else{
 				//inputに時間以外の入力があった時にエラー処理を行う予定
 				//★★フラグを立てる処理が必要？
-				console.log("error");
+				console.log("error number",i,"is",(array[i]));
 			}
 		}
 	}
@@ -77,6 +80,8 @@ class inputTimeEditer{
 			array2.push(VALUE);
 		}
 		console.log('array2',array2);
+		this.inputTimeMin = array2;
+		console.log('this.inputTimeMin',this.inputTimeMin);
 	}
 
 	//時間数を分単位に変換 10:20→t2T(10,20)→80
@@ -96,7 +101,7 @@ class inputTimeEditer{
 /////////////////
 //1日ごとの計算///
 /////////////////
-class Stick{
+class day{
 	constructor(planTime,workTime){
 		// this.data = timeInput.value;
 		// //inputに入れた数値をバラバラにする
@@ -304,28 +309,75 @@ class week{
 
 
 
+/////////////////
+//stick module///
+/////////////////
+class stickModule{
+	constructor(timeInput){
+		this.data = timeInput;
+	}
+	
+	//inputTimeEditerを使ってデータの読み込み
+	makeStick = function(){
+		this.inputTime();
+	}
+
+	
+
+	
+	inputTime = function(){
+		//inputTimeEditerを使ってデータの読み込み
+		let inputTimeEditer1 = new inputTimeEditer(this.data);
+		inputTimeEditer1.make();
+		const array = inputTimeEditer1.inputTimeMin;
+
+		//dayを使って日毎にインスタンスを作成
+		for (let i = 0; i < array.length; i+=2) {
+			let days = new day(array[i],array[i+1]);
+			days.addValue();
+			console.log('do',i);
+		}
+
+		let n = 0;
+
+		while (n < array.length) {
+		  n++;
+		}
+		
+		console.log(n);
+
+
+
+	}
+
+  
+
+}
+
+
+
+
 goStick.addEventListener('click',()=>{
 	// クリック時にデータを取得
 	data = timeInput.value;
-	let inputTimeEditer1 = new inputTimeEditer(timeInput);
-	inputTimeEditer1.make();
-
-	for (let k = 0; k < inputTimeEditer1.inputTime; k+=2) {
-		let Stick = new Stick(timeInput);
-		this.calcTime(inputTimeEditer1.inputTime[k],inputTimeEditer1.inputTime[k+1]);
-	}
+	// let inputTimeEditer1 = new inputTimeEditer(timeInput);
+	let inputTimeEditer1 = new stickModule(timeInput);
+	inputTimeEditer1.makeStick();
 
 
 
-	Stick1.resetValue();
-	Stick1.addValue();
+
+
+	//Stick1.resetValue();
+	//Stick1.addValue();
 });
 
 
 /*
 10:10-17:20
 10:30-20:50
-
+x
+x
 10:00-15:00
 10:00-20:00
 
