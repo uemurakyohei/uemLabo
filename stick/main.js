@@ -14,7 +14,7 @@ const stickBox = document.getElementById('resuletBox');
 let classCount = 0;
 
 /////////////////
-//時間の加工//////
+//時間の加工//////timeInput(~)→array[p1,w1,p2,w2...]
 /////////////////
 class inputTimeEditer{
 	constructor(timeInput){
@@ -99,18 +99,13 @@ class inputTimeEditer{
 }
 
 /////////////////
-//1日ごとの計算///
+//1日ごとの計算///day(planTime,workTime)→day.SHOTEIGAI,SHOTEINAI,PLANTIME
 /////////////////
 class day{
 	constructor(planTime,workTime){
-		// this.data = timeInput.value;
-		// //inputに入れた数値をバラバラにする
-		// this.time = this.data.split(/[\n\-\:]/);
-		// this.time = this.time.filter(Boolean);
-		// this.timeData = [];
+
 		this.planTime = planTime;
 		this.workTime = workTime;
-
 
 		//所定内、法定内、法定外
 		this.SHOTEIGAI = 0;
@@ -120,57 +115,32 @@ class day{
 		classCount +=1;
 	}
 		
-	//所定内、法定内、法定外をDOMに代入する、stick!作成
-	addValue = function(){
-		this.defineTime();
+	// //所定内、法定内、法定外をDOMに代入する、stick!作成
+	// addValue = function(){
+	// 	this.defineTime();
 
-		let stick = this.divMake('stick',99);
-		let planedStick = this.divMake('planedStick',99);
-		let workStick = this.divMake('workStick',99);
+	// 	let stick = this.divMake('stick',99);
+	// 	let planedStick = this.divMake('planedStick',99);
+	// 	let workStick = this.divMake('workStick',99);
 		
-		let overTime = this.divMake('overTime',this.SHOTEIGAI);
-		workStick.appendChild(overTime);
+	// 	let overTime = this.divMake('overTime',this.SHOTEIGAI);
+	// 	workStick.appendChild(overTime);
 		
-		let outTime = this.divMake('outTime',this.SHOTEINAI);
-		workStick.appendChild(outTime);
+	// 	let outTime = this.divMake('outTime',this.SHOTEINAI);
+	// 	workStick.appendChild(outTime);
 
-		let planTime = this.divMake('planTime',this.PLANTIME);
-		workStick.appendChild(planTime);
+	// 	let planTime = this.divMake('planTime',this.PLANTIME);
+	// 	workStick.appendChild(planTime);
 
 
 
-		stick.appendChild(workStick);
-		stickBox.appendChild(stick);
-	}
+	// 	stick.appendChild(workStick);
+	// 	stickBox.appendChild(stick);
+	// }
 
 
 	//値を定義する
 	defineTime = function(){
-		// // array:時間帯を格納
-		// let array = [];
-		// // array2:時間数を格納
-		// let array2 = [];
-
-		// //分単位で時間を格納
-		// for (let i = 1; i < this.time.length+1; i+=2) {
-		// 	let TIME = this.t2T(Number(this.time[i-1]),Number(this.time[i]));
-		// 	array.push(TIME);
-		// 	}
-		// console.log('array',array);
-
-		// //時間数を計算
-		// for (let j = 1; j < array.length+1; j+=2) {
-		// 	let VALUE = this.time2value(array[j-1],array[j]);
-		// 	array2.push(VALUE);
-		// 	}
-		// console.log('array2',array2);
-
-
-		//所定内、法定内、法定外を計算する
-		// for (let k = 1; k < array2.length+1; k+=2) {
-		// 	this.calcTime(array2[k-1],array2[k]);
-		// 	}
-
 		this.calcTime(this.planTime,this.workTime);
 	}
 
@@ -198,25 +168,12 @@ class day{
 
 
 
-
-
-	// //時間数を分単位に変換 10:20→t2T(10,20)→80
-	// t2T = function(t1,t2){
-	// 	let TIME = t1*60 + t2;
-	// 	return TIME
-	// }
-
 	//分単位を時間数に変換 90→1.5
 	T2t = function(TIME){
 		let time =Math.floor(TIME/60*100)/100;
 		return time
 	}
 
-	// //時間数を算出
-	// time2value = function(t1,t2){
-	// 	let value = t2 -t1;
-	// 	return value;
-	// }
 
 
 
@@ -259,7 +216,7 @@ class day{
 
 
 
-	//データのリセット
+	//データのリセット★★要検討
 	resetValue = function(){
 		this.time = 0;
 		this.timeData = [];
@@ -310,14 +267,14 @@ class week{
 
 
 /////////////////
-//stick module///
+//stick module///→day、classを呼び出し描画する
 /////////////////
 class stickModule{
 	constructor(timeInput){
 		this.data = timeInput;
 	}
 	
-	//inputTimeEditerを使ってデータの読み込み
+	//inputTimeEditer classを使ってデータの読み込み
 	makeStick = function(){
 		this.inputTime();
 	}
@@ -331,25 +288,83 @@ class stickModule{
 		inputTimeEditer1.make();
 		const array = inputTimeEditer1.inputTimeMin;
 
-		//dayを使って日毎にインスタンスを作成
-		for (let i = 0; i < array.length; i+=2) {
-			let days = new day(array[i],array[i+1]);
-			days.addValue();
-			console.log('do',i);
-		}
-
-		let n = 0;
-
-		while (n < array.length) {
-		  n++;
-		}
-		
-		console.log(n);
-
-
+		this.addValue(array);
 
 	}
 
+	//所定内、法定内、法定外をDOMに代入する、stick!作成
+	addValue = function(array){
+
+		let stick = this.divMake('stick',99);
+		let planedStick = this.divMake('planedStick',99);
+
+
+		console.log("長さ",array.length);
+
+		//day classを使って日毎にインスタンスを作成
+		//1日ごとの勤怠時間を計算
+		for (let i = 0; i < array.length; i+=2) {
+
+			let workStick = this.divMake('workStick',99);
+
+
+			let days = new day(array[i],array[i+1]);	
+			days.defineTime();
+
+			console.log("1所定外",days.SHOTEIGAI);
+			
+			let overTime = this.divMake('overTime',days.SHOTEIGAI);
+			workStick.appendChild(overTime);
+			
+			let outTime = this.divMake('outTime',days.SHOTEINAI);
+			workStick.appendChild(outTime);
+	
+			let planTime = this.divMake('planTime',days.PLANTIME);
+			workStick.appendChild(planTime);
+
+			stick.appendChild(workStick);
+
+
+			if(i>0 && i%14 == 0){
+				stickBox.appendChild(stick);
+				let stick = this.divMake('stick',99);
+			}
+		}
+	
+		// if(array.length%14 != 0){
+		// 	stick.appendChild(workStick);
+		// }
+
+		stickBox.appendChild(stick);
+	}		
+
+	//div作成関数///
+	divMake = function(divName,Time){
+
+
+		let div = document.createElement("div");
+		div.className= divName;
+
+		if(Time==0){
+			//0の時にはdivを作成しない
+			div.style.height = "auto";
+			div.textContent = "REST";
+		}
+		else if(Time!=99){
+			//99:class=stick(親要素)の時には不要な要素
+			//分で計算した値を時間数として扱う
+			let time = this.T2t(Time);
+			div.textContent = time;
+			div.style.height = time*10 + "px";
+		}
+		return div;
+	}
+
+	//分単位を時間数に変換 90→1.5
+	T2t = function(TIME){
+		let time =Math.floor(TIME/60*100)/100;
+		return time
+	}
   
 
 }
@@ -376,11 +391,27 @@ goStick.addEventListener('click',()=>{
 /*
 10:10-17:20
 10:30-20:50
-x
-x
+
 10:00-15:00
 10:00-20:00
 
+10:10-17:20
+10:30-20:50
+
+x
+x
+
+10:00-15:00
+10:00-20:00
+
+10:10-17:20
+10:30-20:50
+
+x
+x
+
+10:00-15:00
+10:00-20:00
 
 file:///C:/Users/uemura/git/stick/index.html
 
