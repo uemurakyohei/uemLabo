@@ -8,7 +8,7 @@ const goStick = document.querySelector('#goStick button');
 var data;
 
 //documentからid属性がstickBoxである要素を取得する
-const stickBox = document.getElementById('resuletBox');
+const resultBox = document.getElementById('resultBox');
 
 //作成した棒グラフの数を数える
 let classCount = 0;
@@ -18,7 +18,9 @@ let classCount = 0;
 /////////////////
 class inputTimeEditer{
 	constructor(timeInput){
-		this.data = timeInput.value;
+		//this.data = timeInput.value;		
+		this.data = '\n10:00-18:00\n10:00-18:00\n10:10-17:20\n10:30-20:50\n10:00-15:00\n10:00-20:00\nx\nx\n10:10-17:20\n10:30-20:50\n10:00-15:00\n10:00-20:00\n10:10-17:20\n10:30-20:50\nx\nx\n10:00-15:00\n10:00-20:00';
+
 		//inputに入れた数値をバラバラにする
 		this.time = this.data.split(/[\n\-\:]/);
 		this.time = this.time.filter(Boolean);
@@ -295,48 +297,46 @@ class stickModule{
 	//所定内、法定内、法定外をDOMに代入する、stick!作成
 	addValue = function(array){
 
-		let stick = this.divMake('stick',99);
-		let planedStick = this.divMake('planedStick',99);
-
-
-		console.log("長さ",array.length);
-
 		//day classを使って日毎にインスタンスを作成
 		//1日ごとの勤怠時間を計算
-		for (let i = 0; i < array.length; i+=2) {
+		for (let i = 0; i < array.length; i+=14) {
 
-			let workStick = this.divMake('workStick',99);
+			let stickBox = this.divMake('stickBox',99);
 
-
-			let days = new day(array[i],array[i+1]);	
-			days.defineTime();
-
-			console.log("1所定外",days.SHOTEIGAI);
-			
-			let overTime = this.divMake('overTime',days.SHOTEIGAI);
-			workStick.appendChild(overTime);
-			
-			let outTime = this.divMake('outTime',days.SHOTEINAI);
-			workStick.appendChild(outTime);
-	
-			let planTime = this.divMake('planTime',days.PLANTIME);
-			workStick.appendChild(planTime);
-
-			stick.appendChild(workStick);
-
-
-			if(i>0 && i%14 == 0){
-				stickBox.appendChild(stick);
+			for (let j = 0+i; j < 14+i; j+=2) {
 				let stick = this.divMake('stick',99);
-			}
-		}
-	
-		// if(array.length%14 != 0){
-		// 	stick.appendChild(workStick);
-		// }
+				let workStick = this.divMake('workStick',99);
+				let planedStick = this.divMake('planedStick',99);
+		
+				let days = new day(array[j],array[j+1]);	
+				days.defineTime();
+		
+				let overTime = this.divMake('overTime',days.SHOTEIGAI);
+				workStick.appendChild(overTime);
+				
+				let outTime = this.divMake('outTime',days.SHOTEINAI);
+				workStick.appendChild(outTime);
+				
+				let planTime = this.divMake('planTime',days.PLANTIME);
+				workStick.appendChild(planTime);
 
-		stickBox.appendChild(stick);
+				stick.appendChild(workStick);
+
+				stickBox.appendChild(stick);
+			}
+			
+
+
+			resultBox.appendChild(stickBox);
+				
+			
+
+		}
+
 	}		
+
+
+
 
 	//div作成関数///
 	divMake = function(divName,Time){
@@ -347,8 +347,8 @@ class stickModule{
 
 		if(Time==0){
 			//0の時にはdivを作成しない
-			div.style.height = "auto";
-			div.textContent = "REST";
+			div.style.height = 0;
+			div.textContent = "";
 		}
 		else if(Time!=99){
 			//99:class=stick(親要素)の時には不要な要素

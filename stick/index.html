@@ -9,8 +9,8 @@
 </head>
 <body>
 	<h1>勤務時間　棒グラフ！</h1>
-	<div id="stickBox">
-		<div id="stick1" class="stick">
+	<div id="stickBox" class="stickBox">
+		<div id="" class="stick">
 			<div class="planedStick">
 				<div class="overTime planedIn">3</div>
 				<div class="outTime planedIn">2</div>
@@ -30,7 +30,11 @@
 		<p id="goStick"><button>go!</button></p>
 		
 	<h2>結果（仮）</h2>
-		<div id="resuletBox"></div>
+		<div id="resultBox"></div>
+
+
+
+
 <script src="main.js"></script>
 </body>
 </html>
@@ -45,6 +49,8 @@
 
 
 <style>
+body div{font-size: 2vmin;}
+.stickBox{display: flex;flex-direction: row;align-items: flex-end;margin-bottom: 14px;}
 .stick{display: flex;flex-direction: row;align-items: flex-end;}
 
 /* planedTime */
@@ -56,7 +62,7 @@
 
 
 /* workStick */
-.stick .workStick{width: 20px;text-align: center;}
+.stick .workStick{width: 20px;text-align: center;margin-right: 40px;}
 .stick .workStick .overTime{height: 30px;background-color: #ed2d31;}
 .stick .workStick .outTime{height: 20px;background-color: #fbba36;}
 .stick .workStick .planTime{height: 60px;background-color: #aadeeb;}
