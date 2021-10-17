@@ -10,21 +10,33 @@
 <body>
 	<h1>勤務時間　棒グラフ！</h1>
 	<div id="stickBox" class="stickBox">
-		<div id="" class="stick">
-			<div class="planedStick">
-				<div class="overTime planedIn">3</div>
-				<div class="outTime planedIn">2</div>
-				<div class="planTime planedIn">6</div>
+		<div class="dayBox">
+			<div id="" class="stick">
+				<div class="planedStick">
+					<div class="overTime planedIn">3</div>
+					<div class="outTime planedIn">2</div>
+					<div class="planTime planedIn">6</div>
+				</div>
+				<div class="workStick">
+					<div class="overTime workIn">3</div>
+					<div class="outTime workIn">2.5</div>
+					<div class="planTime workIn">6</div>
+				</div>
 			</div>
-			<div class="workStick">
-				<div class="overTime workIn">3</div>
-				<div class="outTime workIn">2</div>
-				<div class="planTime workIn">6.5</div>
-			</div>
+			<div class="day">day1</div>
+		</div>
+	</div>
+	<p>シフト予定時間：10:00-16:00<br>拘束時間：10:00-21:00</p>
+
+	<div class="weekStick">
+		<div class="weekPlan">40</div>
+		<div class="weekWork">
+			<div class="weekOut">40</div>
+			<div class="weekOver">8</div>
 		</div>
 	</div>
 
-	
+
 	<h2>時間入力</h2>
 		<textarea id="timeInput" cols="50" rows="10"></textarea>
 		<p id="goStick"><button>go!</button></p>
@@ -63,9 +75,19 @@ body div{font-size: 2vmin;}
 
 /* workStick */
 .stick .workStick{width: 20px;text-align: center;margin-right: 40px;}
-.stick .workStick .overTime{height: 30px;background-color: #ed2d31;}
-.stick .workStick .outTime{height: 20px;background-color: #fbba36;}
-.stick .workStick .planTime{height: 60px;background-color: #aadeeb;}
+.stick .workStick .overTime{height: 30px;border-left:20px solid #ed2d31;}
+.stick .workStick .outTime{height: 25px;border-left:20px solid #fbba36;}
+.stick .workStick .planTime{height: 60px;border-left:20px solid #aadeeb;}
 
 /* https://fonts.google.com/specimen/Press+Start+2P#standard-styles */
+
+
+/* weekStick */
+.weekStick {margin-bottom: 30px;}
+.weekStick .weekPlan{width: 320px;border-bottom: solid black 4px;margin-bottom: 10px;}
+.weekStick .weekWork{display: flex;}
+.weekStick .weekOut{width: 320px;border-top: solid #aadeeb 24px;}
+.weekStick .weekOver{width: 48px;border-top: solid #ed2d31 24px;}
+
+
 </style>
