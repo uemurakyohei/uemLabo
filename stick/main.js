@@ -18,8 +18,8 @@ let classCount = 0;
 /////////////////
 class inputTimeEditer{
 	constructor(timeInput){
-		//this.data = timeInput.value;		
-		this.data = '\n\n10:00-18:00\n\n10:00-16:00\n\n10:00-18:00\n\n10:00-20:50\n\n10:00-15:00\n\n10:00-20:00\n\nx\n\nx\n\n10:00-17:30\n\n10:00-18:30\n\nx\n\n10:00-20:00\n\n10:00-17:30\n\n10:00-18:00\n\nx\n\nx\n\n10:00-17:30\n\n10:00-18:00';
+		this.data = timeInput.value;		
+		//this.data = '\n\n10:00-18:00\n\n10:00-16:00\n\n10:00-18:00\n\n10:00-20:50\n\n10:00-15:00\n\n10:00-20:00\n\nx\n\nx\n\n10:00-17:30\n\n10:00-18:30\n\nx\n\n10:00-20:00\n\n10:00-17:30\n\n10:00-18:00\n\nx\n\nx\n\n10:00-17:30\n\n10:00-18:00';
 
 		//inputに入れた数値をバラバラにする
 		this.time = this.data.split(/[\n\-\:]/);
@@ -169,22 +169,16 @@ class day{
 
 
 
-	//データのリセット★★要検討
-	resetValue = function(){
-		this.time = 0;
-		this.timeData = [];
+	resetData = function(){
+		this.planTime = planTime;
+		this.workTime = workTime;
 
-		//所定内、法定内、法定外
+		//実働、法定内、法定外
 		this.SHOTEIGAI = 0;
 		this.SHOTEINAI  = 0;
-		this.PLANTIME = 0
+		this.JITSUDOU = 0;
 
-		//すでにstickが作成されていたら消去する
-		let oldStick = document.getElementsByClassName('stick');
-		if(oldStick){
-			oldStick.innerHTML = '';
-			oldStick.remove;
-		}
+		classCount = 1;
 	}
 
 
@@ -218,25 +212,73 @@ class week{
 	calcTime = function(p,w){
 		if(p > 40){
 			this.PLANTIME = p;
-			console.log("yesyesysesopopo")
 		}else{
 			this.PLANTIME = 40;
-			console.log("nononoopopop")
 		}
 
 		if(w > this.PLANTIME){
 			this.SHOTEIGAI = w - this.PLANTIME;
 			this.SHOTEINAI = this.PLANTIME;
-			console.log("yesyesyses")
 		}else{
-			this.SHOTEIGAI = w;
-			this.SHOTEINAI = 0;
-			console.log("nonono")
+			this.SHOTEIGAI = 0;
+			this.SHOTEINAI = w;
 		}
 	}
 
 
+	resetData = function(){
+		this.SHOTEIGAI = 0;
+		this.SHOTEINAI = 0;
+		this.PLANTIME  = 0;
+	}
 
+
+
+}
+
+
+
+/////////////////
+//1ヶ月ごとの計算///month(workTimeM,dayM)→month.SHOTEIGAI,SHOTEINAI,PLANTIME
+/////////////////
+class month{
+	constructor(workTimeM,dayM){
+		//一週間分の所定時間と実働時間
+		this.workTime = workTimeM;
+		this.dayM = dayM;
+
+		//実働、法定内、法定外
+		this.SHOTEIGAI = 0;
+		this.SHOTEINAI = 0;
+		this.PLANTIME  = 0;
+	}
+
+	//値を定義する
+	defineTime = function(){
+		this.calcTime(this.workTime,this.dayM);
+	}
+
+
+	//一ヶ月分の所定時間と月の所定外時間を計算
+	calcTime = function(w,d){
+
+		this.PLANTIME = 40 * d / 7;
+
+		if(w > this.PLANTIME){
+			this.SHOTEIGAI = w - this.PLANTIME;
+			this.SHOTEINAI = this.PLANTIME;
+		}else{
+			this.SHOTEIGAI = 0;
+			this.SHOTEINAI = w;
+		}
+	}
+
+
+	resetData = function(){
+		this.SHOTEIGAI = 0;
+		this.SHOTEINAI = 0;
+		this.PLANTIME  = 0;
+	}
 
 
 }
@@ -272,6 +314,8 @@ class stickModule{
 
 	//所定内、法定内、法定外をDOMに代入する、stick!作成
 	addValue = function(array){
+
+		let workTimeM = 0;
 
 		//day classを使って日毎にインスタンスを作成
 		//1日ごとの勤怠時間を計算
@@ -344,6 +388,8 @@ class stickModule{
 				planTimeW += days.planTime;
 	
 
+				//month用
+				workTimeM += days.workTime;
 
 			}
 
@@ -373,14 +419,38 @@ class stickModule{
 				
 		}
 
+			//month class呼び出し
+			let months = new month(workTimeM/60,day.count());	
+			months.defineTime();
+			
+			let monthText = this.divMakeMonth('month',99);
+
+			let monthStick = this.divMakeMonth('monthStick',99);
+			let monthPlan = this.divMakeMonth('monthPlan',months.PLANTIME*60);
+			let monthWork = this.divMakeMonth('monthWork',99);
+
+			let monthOut = this.divMakeMonth('monthOut',months.SHOTEINAI*60);
+			let monthOver = this.divMakeMonth('monthOver',months.SHOTEIGAI*60);
+
+			console.log("month",workTimeM/60,months.PLANTIME,months.SHOTEINAI,months.SHOTEIGAI);
+
+			monthWork.appendChild(monthOut);
+			monthWork.appendChild(monthOver);
+
+
+			monthStick.appendChild(monthPlan);
+			monthStick.appendChild(monthWork);
+			monthStick.appendChild(monthText);
+
+			resultBox.appendChild(monthStick);
+
+
+
 	}		
 
 
 
 	//div呼び出し関数
-
-
-
 	//day用 div作成関数///
 	divMakeDay = function(divName,Time){
 
@@ -401,7 +471,7 @@ class stickModule{
 			//分で計算した値を時間数として扱う
 			let time = this.T2t(Time);
 			div.textContent = time;
-			div.style.height = time*10 + "px";
+			div.style.height = time*30 + "px";
 		}
 		return div;
 	}
@@ -434,12 +504,68 @@ class stickModule{
 		return div;
 	}
 
+	//month用 div作成関数///
+	divMakeMonth = function(divName,Time){
+
+		let div = document.createElement("div");
+		div.className= divName;
+
+		if(Time==0){
+			//0の時にはdivを作成しない
+			div.style.width = 0;
+			div.textContent = "";
+		}
+
+		else if(divName=='month'){
+			div.textContent = "month";			
+		}
+
+		else if(Time!=99){
+			//99:class=stick(親要素)の時には不要な要素
+			//分で計算した値を時間数として扱う
+			let time = this.T2t(Time);
+			div.textContent = time;
+			div.style.width = time*10 + "px";
+		}
+		return div;
+	}
+
+}
+
+//goボタン二度押し防止策
+class resetSan{
+	constructor(){
+	}
+	
+	//inputTimeEditer classを使ってデータの読み込み
+	do = function(){
+
+		this.removeDiv();
+
+	}
+
+
+	removeDiv = function(){
+		if(document.querySelector('.monthStick')){
+			const divMonth = document.querySelector('.monthStick');
+			divMonth.remove();	
+		}
+	}
+
+
+	removeValue = funciotn(){
+		
+	}
+
+
 }
 
 
 
-
 goStick.addEventListener('click',()=>{
+	
+	let resetDiv = new resetSan();
+	resetDiv.do();
 
 	// クリック時にデータを取得
 	data = timeInput.value;
@@ -447,74 +573,22 @@ goStick.addEventListener('click',()=>{
 	let inputTimeEditer1 = new stickModule(timeInput);
 	inputTimeEditer1.makeStick();
 
-	console.log("カウント",day.count());
-
-
-
-
-	//Stick1.resetValue();
-	//Stick1.addValue();
 });
 
 
-/*
-10:10-17:20
-10:30-20:50
-
-10:00-15:00
-10:00-20:00
-
-10:10-17:20
-10:30-20:50
-
-x
-x
-
-10:00-15:00
-10:00-20:00
-
-10:10-17:20
-10:30-20:50
-
-x
-x
-
-10:00-15:00
-10:00-20:00
-
-file:///C:/Users/uemura/git/stick/index.html
-
-	//一日のシフトと実働を一つの配列に入れ込む
-	this.timeDate = function(){
-		//空白要素を削除
-		this.time = this.time.filter(Boolean);
-		//this.time = this.time.split('\-');
-		let array = [];
-		for (let i = 1; i < this.time.length+1; i ++) {
-			
-			array.push(this.time[i-1]);
-			console.log(array);
-			if (i%4 == 0){
-				this.timeData.push(array);
-				array = [];
-			}
-		}
-	}
 
 
 
-todo 
 
-	*divmakeDayは外でclassを作って作成
-		じゃないと二度押しされたときに無限にstickが作成されてしまう
-		一週間分作成するときを想定したときに無駄が多くなる気がする
-		7日で改行させるのもこのクラスが受け持つ想定
-	*weekのclassも作成
-		day関数の方を繰り返し呼び出すもの
-		一週間での計算を比較して時間外を計算する
-	*monthのclassも作成
-		一か月での計算を比較して時間外を計算する
-		シンプルになる想定
+// todo 
 
-
-*/
+// 	*divmakeDayは外でclassを作って作成
+// 		じゃないと二度押しされたときに無限にstickが作成されてしまう
+// 		一週間分作成するときを想定したときに無駄が多くなる気がする
+// 		7日で改行させるのもこのクラスが受け持つ想定
+// 	*weekのclassも作成
+// 		day関数の方を繰り返し呼び出すもの
+// 		一週間での計算を比較して時間外を計算する
+// 	*monthのclassも作成
+// 		一か月での計算を比較して時間外を計算する
+// 		シンプルになる想定
