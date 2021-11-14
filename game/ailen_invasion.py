@@ -5,7 +5,8 @@ from settings import Settings
 
 from ship import Ship
 from bullet import Bullet
-from bullet2 import Bullet2
+from alien import Alien
+# from bullet2 import Bullet2
 
 
 class AlienInvasion:
@@ -22,15 +23,32 @@ class AlienInvasion:
         
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
-        self.bullets2 = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+        # self.bullets2 = pygame.sprite.Group()
 
+        self._create_fleet()
     
+    def _create_fleet(self):
+        alien = Alien(self)
+
+        alien_width = alien.rect.width
+        available_space_x = self.settings.screen_width - (2*alien_width)
+        number_aliens_x = available_space_x//(2*alien_width)
+
+        for alien_number in range(number_aliens_x):
+            alien = Alien(self)
+            alien.x = alien_width + 2*alien_width * alien_number
+            alien.rect.x = alien.x
+            self.aliens.add(alien)
+
+
+
     def run_game(self):
         while True:
             self._check_events()
             self.ship.update()
             self._update_bullets()
-            self._update_bullets2()
+            # self._update_bullets2()
             self._update_screen()
 
 
@@ -86,16 +104,16 @@ class AlienInvasion:
             if bullet.rect.bottom <=0:
                 self.bullets.remove(bullet)
 
-    def _fire_bullet2(self):
-        if len(self.bullets2) < self.settings.bullets_allowed2:
-            new_bullet2 = Bullet2(self)
-            self.bullets2.add(new_bullet2)
+    # def _fire_bullet2(self):
+    #     if len(self.bullets2) < self.settings.bullets_allowed2:
+    #         new_bullet2 = Bullet2(self)
+    #         self.bullets2.add(new_bullet2)
 
-    def _update_bullets2(self):
-        self.bullets2.update()
-        for bullet2 in self.bullets2.copy():
-            if bullet2.rect.bottom >= 1000:
-                self.bullets2.remove(bullet2)
+    # def _update_bullets2(self):
+    #     self.bullets2.update()
+    #     for bullet2 in self.bullets2.copy():
+    #         if bullet2.rect.bottom >= 1000:
+    #             self.bullets2.remove(bullet2)
 
 
 
@@ -108,8 +126,10 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
 
-        for bullet2 in self.bullets2.sprites():
-            bullet2.draw_bullet2()
+        self.aliens.draw(self.screen)
+
+        # for bullet2 in self.bullets2.sprites():
+        #     bullet2.draw_bullet2()
         
         pygame.display.flip()
         
