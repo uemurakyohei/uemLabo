@@ -1,11 +1,14 @@
 
 import sys
 import pygame
+from time import sleep
 from settings import Settings
+from game_stats import GameStats
 
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from star import Star
 # from bullet2 import Bullet2
 
 
@@ -22,13 +25,32 @@ class AlienInvasion:
         self.settings.screen_height = self.screen.get_rect().height
         pygame.display.set_caption("エイリアン侵略")
         
+        self.stats = GameStats(self)
+
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+
         # self.bullets2 = pygame.sprite.Group()
 
+        self.stars = pygame.sprite.Group()
+
         self._create_fleet()
+        self._create_stars()
     
+    def _create_stars(self):
+    
+        for num in range(self.settings.stars_num):        
+            self._create_star()
+
+    def _create_star(self):    
+        star1 = Star(self)
+        star1.rect.x = star1.x
+        star1.rect.y = star1.y
+        star1.rect.y = 0
+        self.stars.add(star1)
+
+
     def _create_fleet(self):
         alien = Alien(self)
         alien_width,alien_height = alien.rect.size
@@ -54,13 +76,19 @@ class AlienInvasion:
         self.aliens.add(alien)
 
 
+
+
     def run_game(self):
         while True:
             self._check_events()
-            self.ship.update()
-            self._update_bullets()
-            self._update_aliens()
-            # self._update_bullets2()
+
+
+            if self.stats.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
+                self._update_stars()
+
             self._update_screen()
 
 
@@ -92,8 +120,8 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
 
-        elif event.key == pygame.K_a:
-            self._fire_bullet2()
+        # elif event.key == pygame.K_a:
+        #     self._fire_bullet2()
 
 
     def _check_keyup_events(self,event):
@@ -120,6 +148,9 @@ class AlienInvasion:
         self._check_bullet_alien_collisions()
 
 
+
+        
+
     def _check_bullet_alien_collisions(self):
 
         collisions = pygame.sprite.groupcollide(self.bullets,self.aliens,True,True)
@@ -136,6 +167,41 @@ class AlienInvasion:
         self.aliens.update()
 
 
+        if pygame.sprite.spritecollideany(self.ship,self.aliens):
+            self._ship_hit()
+
+        self._check_aliens_bottom()
+
+
+    def _check_aliens_bottom(self):
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                #宇宙船とぶつかったときと同じ！
+                self._ship_hit()
+                break
+
+
+
+    def _ship_hit(self):
+
+        if self.stats.ships_left > 0:
+
+            #残数　-1
+            self.stats.ships_left -= 1
+            #エイリアンと球を破棄
+            self.aliens.empty()
+            self.bullets.empty()
+            #新しい艦隊を作り、宇宙船を真ん中に置く
+            self._create_fleet()
+            self.ship.center_ship()
+
+            sleep(0.5)
+
+        else:
+            self.stats.game_active = False
+
+
     def _check_fleet_edges(self):
         for alien in self.aliens.sprites():
             if alien.check_edges():
@@ -147,7 +213,23 @@ class AlienInvasion:
             alien.rect.y +=self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
 
+    def _update_stars(self):
+        self.stars.update()
 
+        for star in self.stars:
+            if star.check_edges():
+                star.y = 0
+                # star.draw_star()
+
+                # self.stars.remove(star)
+                # self._creatte_new_star()
+
+
+    def _creatte_new_star(self):
+        star1 = Star(self)
+        star1.rect.x = star1.x
+        star1.rect.y = 0
+        self.stars.add(star1)
 
     # def _fire_bullet2(self):
     #     if len(self.bullets2) < self.settings.bullets_allowed2:
@@ -165,13 +247,19 @@ class AlienInvasion:
     def _update_screen(self):
         #ループを通過するたびに画面を再描画する
         self.screen.fill(self.settings.bg_color)
-        
+
+        for star in self.stars.sprites():
+            star.draw_star()        
+
         self.ship.blitme()
 
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
 
         self.aliens.draw(self.screen)
+
+
+
 
         # for bullet2 in self.bullets2.sprites():
         #     bullet2.draw_bullet2()
