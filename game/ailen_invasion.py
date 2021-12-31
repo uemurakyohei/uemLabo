@@ -4,6 +4,7 @@ import pygame
 from time import sleep
 from settings import Settings
 from game_stats import GameStats
+from scoreboard import Scoreboard
 from button import Button
 
 
@@ -28,6 +29,7 @@ class AlienInvasion:
         pygame.display.set_caption("エイリアン侵略")
         
         self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
 
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -114,8 +116,27 @@ class AlienInvasion:
                 self._check_keyup_events(event)
 
     def _check_play_button(self,mouse_pos):
-        if self.play_button.rect.collidepoint(mouse_pos):
+
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+
+        if button_clicked and not self.stats.game_active:
+            self.stats.reset_stats()
             self.stats.game_active = True
+
+            self.sb.prep_score()
+            self.sb.prep_level()
+            self.sb.prep_ships()
+
+            self.aliens.empty()
+            self.bullets.empty()
+
+            self._create_fleet()
+            self.ship.center_ship()
+
+            pygame.mouse.set_visible(False)
+
+            #設定値をリセット
+            self.settings.initialize_dynamic_settings()
 
 
     def _check_keydown_events(self,event):
@@ -168,11 +189,22 @@ class AlienInvasion:
 
         collisions = pygame.sprite.groupcollide(self.bullets,self.aliens,True,True)
 
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += self.settings.alien_points * len(aliens)
+            self.sb.prep_score()
+            self.sb.check_high_score()
+
+
+        #aliensがいなくなったとき
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
 
+            self.stats.level += 1
+            self.sb.prep_level()
 
 
     def _update_aliens(self):
@@ -194,14 +226,13 @@ class AlienInvasion:
                 self._ship_hit()
                 break
 
-
-
     def _ship_hit(self):
 
         if self.stats.ships_left > 0:
-
             #残数　-1
             self.stats.ships_left -= 1
+            self.sb.prep_ships()
+
             #エイリアンと球を破棄
             self.aliens.empty()
             self.bullets.empty()
@@ -213,6 +244,7 @@ class AlienInvasion:
 
         else:
             self.stats.game_active = False
+            pygame.mouse.set_visible(True)
 
 
     def _check_fleet_edges(self):
@@ -270,6 +302,8 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.aliens.draw(self.screen)
+
+        self.sb.show_score()
 
         if not self.stats.game_active:
             self.play_button.draw_button()
